@@ -132,15 +132,19 @@ public class HttpJobDefinition extends AbstractJobDefinition {
         private void configure(JobDataMap dataMap) {
             Optional<String> trustAllCerts;
             Optional<String> trustAllHosts;
+            Optional<String> followRedirect;
             if (getHttpConfiguration() == null) {
                 trustAllCerts = Optional.fromNullable(System.getProperty(HttpConfiguration.TRUST_ALL_CERTS_PROPERTY));
                 trustAllHosts = Optional.fromNullable(System.getProperty(HttpConfiguration.TRUST_ALL_HOSTS_PROPERTY));
+                followRedirect = Optional.fromNullable(System.getProperty(HttpConfiguration.FOLLOW_REDIRECT_PROPERTY));
             } else {
                 trustAllCerts = Optional.of(Boolean.toString(getHttpConfiguration().isTrustAllCerts()));
                 trustAllHosts = Optional.of(Boolean.toString(getHttpConfiguration().isTrustAllHosts()));
+                followRedirect = Optional.of(Boolean.toString(getHttpConfiguration().isFollowRedirect()));
             }
             dataMap.put(HttpConfiguration.TRUST_ALL_CERTS_FIELD, trustAllCerts.or(Boolean.toString(false)));
             dataMap.put(HttpConfiguration.TRUST_ALL_HOSTS_FIELD, trustAllHosts.or(Boolean.toString(false)));
+            dataMap.put(HttpConfiguration.FOLLOW_REDIRECT_FIELD, followRedirect.or(Boolean.toString(false)));
         }
 
         @Override
@@ -172,7 +176,7 @@ public class HttpJobDefinition extends AbstractJobDefinition {
 
             setContentType(jobDataMap, request);
             setCrendentials(jobDataMap, request);
-            setSecurityParams(jobDataMap, request);
+            setHttpParams(jobDataMap, request);
 
             request.send(body);
             int code = request.code();
@@ -181,12 +185,15 @@ public class HttpJobDefinition extends AbstractJobDefinition {
             logger.info("{} {} => {}\n{}", method, url, code, responseBody);
         }
 
-        private void setSecurityParams(JobDataMap jobDataMap, HttpRequest request) {
+        private void setHttpParams(JobDataMap jobDataMap, HttpRequest request) {
             if (jobDataMap.getBooleanFromString(HttpConfiguration.TRUST_ALL_HOSTS_FIELD)) {
                 request.trustAllHosts();
             }
             if (jobDataMap.getBooleanFromString(HttpConfiguration.TRUST_ALL_CERTS_FIELD)) {
                 request.trustAllCerts();
+            }
+            if (jobDataMap.getBooleanFromString(HttpConfiguration.FOLLOW_REDIRECT_FIELD)) {
+                request.followRedirects(true);
             }
         }
 
