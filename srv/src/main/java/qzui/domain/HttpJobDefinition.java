@@ -130,21 +130,10 @@ public class HttpJobDefinition extends AbstractJobDefinition {
         }
 
         private void configure(JobDataMap dataMap) {
-            Optional<String> trustAllCerts;
-            Optional<String> trustAllHosts;
-            Optional<String> followRedirect;
-            if (getHttpConfiguration() == null) {
-                trustAllCerts = Optional.fromNullable(System.getProperty(HttpConfiguration.TRUST_ALL_CERTS_PROPERTY));
-                trustAllHosts = Optional.fromNullable(System.getProperty(HttpConfiguration.TRUST_ALL_HOSTS_PROPERTY));
-                followRedirect = Optional.fromNullable(System.getProperty(HttpConfiguration.FOLLOW_REDIRECT_PROPERTY));
-            } else {
-                trustAllCerts = Optional.of(Boolean.toString(getHttpConfiguration().isTrustAllCerts()));
-                trustAllHosts = Optional.of(Boolean.toString(getHttpConfiguration().isTrustAllHosts()));
-                followRedirect = Optional.of(Boolean.toString(getHttpConfiguration().isFollowRedirect()));
-            }
-            dataMap.put(HttpConfiguration.TRUST_ALL_CERTS_FIELD, trustAllCerts.or(Boolean.toString(false)));
-            dataMap.put(HttpConfiguration.TRUST_ALL_HOSTS_FIELD, trustAllHosts.or(Boolean.toString(false)));
-            dataMap.put(HttpConfiguration.FOLLOW_REDIRECT_FIELD, followRedirect.or(Boolean.toString(false)));
+            HttpConfiguration httpConfiguration = Optional.fromNullable(getHttpConfiguration()).or(new HttpConfiguration());
+            dataMap.put(HttpConfiguration.TRUST_ALL_CERTS_FIELD, Boolean.toString(httpConfiguration.isTrustAllCerts()));
+            dataMap.put(HttpConfiguration.TRUST_ALL_HOSTS_FIELD, Boolean.toString(httpConfiguration.isTrustAllHosts()));
+            dataMap.put(HttpConfiguration.FOLLOW_REDIRECT_FIELD, Boolean.toString(httpConfiguration.isFollowRedirect()));
         }
 
         @Override
@@ -185,14 +174,21 @@ public class HttpJobDefinition extends AbstractJobDefinition {
             logger.info("{} {} => {}\n{}", method, url, code, responseBody);
         }
 
+        private boolean property(String name) {
+            return Boolean.valueOf(Optional.fromNullable(System.getProperty(name)).or(Boolean.FALSE.toString()));
+        }
+
         private void setHttpParams(JobDataMap jobDataMap, HttpRequest request) {
-            if (jobDataMap.getBooleanFromString(HttpConfiguration.TRUST_ALL_HOSTS_FIELD)) {
+            if (jobDataMap.getBooleanFromString(HttpConfiguration.TRUST_ALL_HOSTS_FIELD)
+                    || property(HttpConfiguration.TRUST_ALL_HOSTS_PROPERTY)) {
                 request.trustAllHosts();
             }
-            if (jobDataMap.getBooleanFromString(HttpConfiguration.TRUST_ALL_CERTS_FIELD)) {
+            if (jobDataMap.getBooleanFromString(HttpConfiguration.TRUST_ALL_CERTS_FIELD)
+                    || property(HttpConfiguration.TRUST_ALL_CERTS_PROPERTY)) {
                 request.trustAllCerts();
             }
-            if (jobDataMap.getBooleanFromString(HttpConfiguration.FOLLOW_REDIRECT_FIELD)) {
+            if (jobDataMap.getBooleanFromString(HttpConfiguration.FOLLOW_REDIRECT_FIELD)
+                    || property(HttpConfiguration.FOLLOW_REDIRECT_PROPERTY)) {
                 request.followRedirects(true);
             }
         }
