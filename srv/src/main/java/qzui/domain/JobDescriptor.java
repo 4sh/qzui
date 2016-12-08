@@ -14,15 +14,13 @@ import java.util.*;
  * Date: 18/2/14
  * Time: 21:35
  */
-@JsonTypeInfo(
-        use = JsonTypeInfo.Id.NAME,
-        include = JsonTypeInfo.As.PROPERTY,
-        property = "type")
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
 @JsonSubTypes({
-        @JsonSubTypes.Type(value = HttpJobDefinition.HttpJobDescriptor.class, name = "http"),
-        @JsonSubTypes.Type(value = LogJobDefinition.LogJobDescriptor.class, name = "log")
+        @JsonSubTypes.Type(value = HttpJobDescriptor.class, name = "http"),
+        @JsonSubTypes.Type(value = LogJobDescriptor.class, name = "log")
 })
 public abstract class JobDescriptor {
+
     private String name;
     private String group;
     private Map<String, Object> data = new LinkedHashMap<>();
@@ -72,7 +70,6 @@ public abstract class JobDescriptor {
         for (TriggerDescriptor triggerDescriptor : triggerDescriptors) {
             triggers.add(triggerDescriptor.buildTrigger());
         }
-
         return triggers;
     }
 

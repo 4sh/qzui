@@ -14,6 +14,7 @@ import static org.quartz.TriggerBuilder.newTrigger;
  * Time: 21:55
  */
 public class TriggerDescriptor {
+
     public static TriggerDescriptor buildDescriptor(Trigger trigger) {
         return new TriggerDescriptor()
                 .setGroup(trigger.getKey().getGroup())
