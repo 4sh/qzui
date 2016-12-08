@@ -89,6 +89,7 @@ public class HttpJobDescriptor extends JobDescriptor {
         dataMap.put("contentType", contentType);
         dataMap.put("login", login);
         dataMap.put("pwd", pwdHash);
+        dataMap.put("httpConfiguration", httpConfiguration);
 
         return JobBuilder.newJob(HttpJob.class)
                 .withIdentity(getName(), getGroup())

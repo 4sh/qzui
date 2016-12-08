@@ -4,6 +4,7 @@ import org.quartz.Job;
 import org.quartz.JobDetail;
 import org.quartz.Trigger;
 import qzui.domain.AbstractJobDefinition;
+import qzui.domain.HttpConfiguration;
 import qzui.domain.HttpJobDescriptor;
 import qzui.domain.JobDescriptor;
 import qzui.job.HttpJob;
@@ -26,6 +27,7 @@ public class HttpJobDefinition extends AbstractJobDefinition {
         HttpJobDescriptor jobDescriptor = setupDescriptorFromDetail(new HttpJobDescriptor(), jobDetail, triggersOfJob);
 
         return jobDescriptor
+                .setHttpConfiguration((HttpConfiguration) jobDetail.getJobDataMap().get("httpConfiguration"))
                 .setUrl((String) jobDescriptor.getData().remove("url"))
                 .setMethod((String) jobDescriptor.getData().remove("method"))
                 .setBody((String) jobDescriptor.getData().remove("body"));

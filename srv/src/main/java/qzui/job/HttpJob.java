@@ -10,6 +10,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import qzui.domain.HttpConfiguration;
 
+import java.util.Optional;
+
 public class HttpJob implements Job {
 
     private static final Logger logger = LoggerFactory.getLogger(HttpJob.class);
@@ -39,14 +41,15 @@ public class HttpJob implements Job {
     }
 
     private void applyHttpConfiguration(JobDataMap jobDataMap, HttpRequest request) {
-        HttpConfiguration httpConfiguration = (HttpConfiguration) jobDataMap.get("httpConfiguration");
-        if (httpConfiguration.isTrustAllHosts()) {
-            request.trustAllHosts();
-        }
-        if (httpConfiguration.isTrustAllCerts()) {
-            request.trustAllCerts();
-        }
-        request.followRedirects(httpConfiguration.isFollowRedirect());
+        Optional.ofNullable((HttpConfiguration) jobDataMap.get("httpConfiguration")).ifPresent((httpConfiguration) -> {
+            if (httpConfiguration.isTrustAllHosts()) {
+                request.trustAllHosts();
+            }
+            if (httpConfiguration.isTrustAllCerts()) {
+                request.trustAllCerts();
+            }
+            request.followRedirects(httpConfiguration.isFollowRedirect());
+        });
     }
 
     private void setCrendentials(JobDataMap jobDataMap, HttpRequest request) {
