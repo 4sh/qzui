@@ -12,10 +12,6 @@ import restx.factory.Component;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * Date: 19/2/14
- * Time: 06:34
- */
 @Component
 public class HttpJobDefinition extends AbstractJobDefinition {
 

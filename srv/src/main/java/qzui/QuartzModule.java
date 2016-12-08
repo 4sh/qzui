@@ -7,10 +7,6 @@ import restx.factory.AutoStartable;
 import restx.factory.Module;
 import restx.factory.Provides;
 
-/**
- * Date: 18/2/14
- * Time: 21:14
- */
 @Module
 public class QuartzModule {
     @Provides

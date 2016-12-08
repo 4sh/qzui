@@ -10,10 +10,6 @@ import org.quartz.Trigger;
 
 import java.util.*;
 
-/**
- * Date: 18/2/14
- * Time: 21:35
- */
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
 @JsonSubTypes({
         @JsonSubTypes.Type(value = HttpJobDescriptor.class, name = "http"),

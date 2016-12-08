@@ -6,10 +6,6 @@ import org.quartz.Trigger;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Date: 19/2/14
- * Time: 06:30
- */
 public abstract class AbstractJobDefinition implements JobDefinition {
 
     protected <T extends JobDescriptor> T setupDescriptorFromDetail(T jobDescriptor, JobDetail jobDetail, List<? extends Trigger> triggersOfJob) {

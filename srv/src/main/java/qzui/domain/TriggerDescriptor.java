@@ -9,10 +9,6 @@ import static com.google.common.base.Strings.isNullOrEmpty;
 import static org.quartz.CronScheduleBuilder.cronSchedule;
 import static org.quartz.TriggerBuilder.newTrigger;
 
-/**
- * Date: 18/2/14
- * Time: 21:55
- */
 public class TriggerDescriptor {
 
     public static TriggerDescriptor buildDescriptor(Trigger trigger) {
