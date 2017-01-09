@@ -7,6 +7,7 @@ import qzui.job.QuartzJob;
 import qzui.domain.TriggerDescriptor;
 import restx.factory.Component;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -74,7 +75,7 @@ public class SchedulerManager {
                     .findFirst()
                     .map((job) -> {
                         List<TriggerDescriptor> triggerDescriptor = triggers.stream()
-                                .map(trigger -> new TriggerDescriptor().setWhen(trigger.getNextFireTime().toString()))
+                                .map(trigger -> new TriggerDescriptor().setWhen(trigger.getNextFireTime().toInstant().toString()))
                                 .collect(Collectors.toList());
                         return job.buildDescriptor()
                                 .setGroup(group)
