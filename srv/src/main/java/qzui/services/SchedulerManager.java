@@ -3,7 +3,7 @@ package qzui.services;
 import org.quartz.*;
 import org.quartz.impl.matchers.GroupMatcher;
 import qzui.domain.JobDescriptor;
-import qzui.domain.QuartzJob;
+import qzui.job.QuartzJob;
 import qzui.domain.TriggerDescriptor;
 import restx.factory.Component;
 

@@ -6,7 +6,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import qzui.domain.JobDescriptor;
 import qzui.domain.LogJobDescriptor;
-import qzui.domain.QuartzJob;
 import restx.factory.Component;
 
 @Component
