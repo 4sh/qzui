@@ -28,6 +28,12 @@ Qzui, a basic REST and Web front end over [Quartz Scheduler](http://quartz-sched
 * get job detail
 * delete (cancel) a job
 
+### JobStores
+
+All quartz job stores are configurable, a short (non exhaustive) list :
+* In memory (default)
+* [MongoDB](https://github.com/michaelklishin/quartz-mongodb)
+
 ### Easy hacking
 
 As of Feb 2014, Qzui has been developed in a couple of hours, the server part consists of less than 500 LOC:
@@ -46,7 +52,7 @@ Java                            10            110             63            480
 ### get, build and run
 
 ```
-git clone https://github.com/xhanin/qzui.git
+git clone https://github.com/4sh/qzui.git
 cd qzui
 mvn package
 ```
@@ -57,21 +63,13 @@ You can also run the server using [RESTX](http://restx.io/) with `restx app run`
 
 To launch it from your IDE use the `AppServer` class.
 
-### add new job types
-
-Adding a new job type is simple, take example from existing ones:
-
-[HttpJobDefinition](https://github.com/xhanin/qzui/blob/master/srv/src/main/java/qzui/HttpJobDefinition.java)
-
-And do not forget to add the type json value in [JobDescriptor](https://github.com/xhanin/qzui/blob/master/srv/src/main/java/qzui/JobDescriptor.java)
-
 ### add new triggers
 
-Hack the [TriggerDescriptor](https://github.com/xhanin/qzui/blob/master/srv/src/main/java/qzui/TriggerDescriptor.java) class.
+Hack the [TriggerDescriptor](https://github.com/4sh/qzui/blob/master/srv/src/main/java/qzui/domain/TriggerDescriptor.java) class.
 
 ### Hack UI
 
-The basic UI is developed using AngularJS + TW Boostrap, check [ui/app](https://github.com/xhanin/qzui/tree/master/ui/app).
+The basic UI is developed using AngularJS + TW Boostrap, check [ui/app](https://github.com/4sh/qzui/tree/master/ui/app).
 
 ### Configure
 
@@ -80,15 +78,14 @@ We strongly recommend setting up a jobstore if you don't want to lose your jobs 
 
 #### HTTP configuration
 
-Some specific HTTP configuration flags could be set. Two ways to do that :
-* Job specific : fill a configuration object (contained into a job descriptor)
-* Globally : define java properties set on Qzui runtime
-
+Some specific HTTP configuration flags could be set on a job descriptor :
 ```
--Dhttp.ssl.trustAllCerts=true -Dhttp.ssl.trustAllHosts=true
+  "httpConfiguration": {
+        "trustAllHosts": true,
+        "trustAllCerts": true,
+        "followRedirect": true
+  }
 ```
-
-Note that the specific configuration overrides the global one.
 
 ## Usage
 
@@ -157,6 +154,7 @@ Note that jobs MUST have unique names.
   "httpConfiguration": {
         "trustAllHosts": true,
         "trustAllCerts": true,
+        "followRedirect": true
   }
 }
 ```
@@ -167,7 +165,7 @@ Because I don't like embedding a job scheduler inside my web application server,
 
 Therefore I tend to make the web application schedule a job with a REST API call on Qzui, then Qzui call it back when scheduled. This is similar to how [Google App Engine Scheduled Tasks](https://developers.google.com/appengine/docs/java/config/cron) are designed.
 
-And also because it's fun to develop with [RESTX](http://restx/io) + [AngularJS](http://angularjs.org/), and can also be used as an example of how to embed Quartz in a RESTX app (look at [QuartzModule](https://github.com/xhanin/qzui/blob/master/srv/src/main/java/qzui/QuartzModule.java)).
+And also because it's fun to develop with [RESTX](http://restx/io) + [AngularJS](http://angularjs.org/), and can also be used as an example of how to embed Quartz in a RESTX app (look at [QuartzModule](https://github.com/4sh/qzui/blob/master/srv/src/main/java/qzui/QuartzModule.java)).
 
 ## Production ready?
 
