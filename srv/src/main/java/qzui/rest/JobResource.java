@@ -9,6 +9,7 @@ import restx.annotations.POST;
 import restx.annotations.RestxResource;
 import restx.factory.Component;
 
+import java.util.Optional;
 import java.util.Set;
 
 @RestxResource
@@ -34,6 +35,11 @@ public class JobResource {
     @GET("/groups/{group}/jobs")
     public Set<JobKey> getJobKeysByGroup(String group) {
         return schedulerManager.getJobKeysByGroup(group);
+    }
+
+    @GET("/groups/{group}/jobs/{name}")
+    public Optional<JobDescriptor> getJobDescriptor(String group, String name) {
+        return schedulerManager.getJobDescriptor(group, name);
     }
 
     @DELETE("/groups/{group}/jobs/{name}")
