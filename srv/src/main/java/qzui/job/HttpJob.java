@@ -3,12 +3,11 @@ package qzui.job;
 import com.github.kevinsawicki.http.HttpRequest;
 import com.google.common.base.Strings;
 import org.quartz.Job;
-import org.quartz.JobDataMap;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import qzui.domain.HttpConfiguration;
+import qzui.domain.HttpJobDescriptor;
 
 import java.util.Optional;
 
@@ -19,29 +18,23 @@ public class HttpJob implements Job {
     @Override
     public void execute(JobExecutionContext context) throws JobExecutionException {
 
-        JobDataMap jobDataMap = context.getJobDetail().getJobDataMap();
-        String url = jobDataMap.getString("url");
-        String method = jobDataMap.getString("method");
-        HttpRequest request = new HttpRequest(url, method);
+        HttpJobDescriptor descriptor = new HttpJobDescriptor().fillFromJobDetail(context.getJobDetail());
+        HttpRequest request = new HttpRequest(descriptor.getUrl(), descriptor.getMethod());
 
-        String body = "";
-        if (!Strings.isNullOrEmpty(jobDataMap.getString("body"))) {
-            body = jobDataMap.getString("body");
-        }
-
-        setContentType(jobDataMap, request);
-        setCrendentials(jobDataMap, request);
-        applyHttpConfiguration(jobDataMap, request);
+        String body = notNullOrEmpty(descriptor.getBody()).orElse("");
+        notNullOrEmpty(descriptor.getContentType()).ifPresent(request::contentType);
+        setCrendentials(descriptor, request);
+        applyHttpConfiguration(descriptor, request);
 
         request.send(body);
         int code = request.code();
         String responseBody = request.body();
 
-        logger.info("{} {} => {}\n{}", method, url, code, responseBody);
+        logger.info("{} {} => {}\n{}", descriptor.getMethod(), descriptor.getUrl(), code, responseBody);
     }
 
-    private void applyHttpConfiguration(JobDataMap jobDataMap, HttpRequest request) {
-        Optional.ofNullable((HttpConfiguration) jobDataMap.get("httpConfiguration")).ifPresent((httpConfiguration) -> {
+    private void applyHttpConfiguration(HttpJobDescriptor descriptor, HttpRequest request) {
+        Optional.ofNullable(descriptor.getHttpConfiguration()).ifPresent((httpConfiguration) -> {
             if (httpConfiguration.isTrustAllHosts()) {
                 request.trustAllHosts();
             }
@@ -52,18 +45,16 @@ public class HttpJob implements Job {
         });
     }
 
-    private void setCrendentials(JobDataMap jobDataMap, HttpRequest request) {
-        String login = jobDataMap.getString("login");
-        String pwd = jobDataMap.getString("pwd");
-        if (!Strings.isNullOrEmpty(login) && !Strings.isNullOrEmpty(pwd)) {
-            request.basic(login, pwd);
+    private void setCrendentials(HttpJobDescriptor descriptor, HttpRequest request) {
+        if (!Strings.isNullOrEmpty(descriptor.getLogin()) && !Strings.isNullOrEmpty(descriptor.getPwdHash())) {
+            request.basic(descriptor.getLogin(), descriptor.getPwdHash());
         }
     }
 
-    private void setContentType(JobDataMap jobDataMap, HttpRequest request) {
-        String contentType = jobDataMap.getString("contentType");
-        if (!Strings.isNullOrEmpty(contentType)) {
-            request.contentType(contentType);
+    private Optional<String> notNullOrEmpty(String str) {
+        if (Strings.isNullOrEmpty(str)) {
+            return Optional.empty();
         }
+        return Optional.of(str);
     }
 }

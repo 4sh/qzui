@@ -8,7 +8,10 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import org.quartz.JobDetail;
 import org.quartz.Trigger;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
 @JsonSubTypes({
@@ -19,7 +22,6 @@ public abstract class JobDescriptor {
 
     private String name;
     private String group;
-    private Map<String, Object> data = new LinkedHashMap<>();
 
     @JsonProperty("triggers")
     private List<TriggerDescriptor> triggerDescriptors = new ArrayList<>();
@@ -34,10 +36,6 @@ public abstract class JobDescriptor {
 
     public List<TriggerDescriptor> getTriggerDescriptors() {
         return triggerDescriptors;
-    }
-
-    public Map<String, Object> getData() {
-        return data;
     }
 
     public JobDescriptor setName(final String name) {
@@ -55,11 +53,6 @@ public abstract class JobDescriptor {
         return this;
     }
 
-    public JobDescriptor setData(final Map<String, Object> data) {
-        this.data = data;
-        return this;
-    }
-
     @JsonIgnore
     public Set<Trigger> buildTriggers() {
         Set<Trigger> triggers = new LinkedHashSet<>();
@@ -69,14 +62,23 @@ public abstract class JobDescriptor {
         return triggers;
     }
 
-    public abstract JobDetail buildJobDetail();
+    /**
+     * Build job details from descriptor which will be persisted into the configured JobStore.
+     */
+
+    public abstract JobDetail toJobDetail();
+
+    /**
+     * Fill a job descriptor from a persisted JobDetails (into the configured JobStore)
+     */
+
+    public abstract <T extends JobDescriptor> T fillFromJobDetail(JobDetail detail);
 
     @Override
     public String toString() {
         return "JobDescriptor{" +
                 "name='" + name + '\'' +
                 ", group='" + group + '\'' +
-                ", data=" + data +
                 ", triggerDescriptors=" + triggerDescriptors +
                 '}';
     }

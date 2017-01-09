@@ -11,14 +11,6 @@ import static org.quartz.TriggerBuilder.newTrigger;
 
 public class TriggerDescriptor {
 
-    public static TriggerDescriptor buildDescriptor(Trigger trigger) {
-        return new TriggerDescriptor()
-                .setGroup(trigger.getKey().getGroup())
-                .setName(trigger.getKey().getName())
-                .setCron(trigger.getJobDataMap().getString("cron"))
-                .setWhen(trigger.getJobDataMap().getString("when"));
-    }
-
     private String name;
     private String group;
 

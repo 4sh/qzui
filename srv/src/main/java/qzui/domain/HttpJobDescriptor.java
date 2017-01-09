@@ -79,9 +79,9 @@ public class HttpJobDescriptor extends JobDescriptor {
     }
 
     @Override
-    public JobDetail buildJobDetail() {
+    public JobDetail toJobDetail() {
 
-        JobDataMap dataMap = new JobDataMap(getData());
+        JobDataMap dataMap = new JobDataMap();
 
         dataMap.put("url", url);
         dataMap.put("method", method);
@@ -95,6 +95,22 @@ public class HttpJobDescriptor extends JobDescriptor {
                 .withIdentity(getName(), getGroup())
                 .usingJobData(dataMap)
                 .build();
+    }
+
+    @Override
+    public <T extends JobDescriptor> T fillFromJobDetail(JobDetail detail) {
+
+        JobDataMap map = detail.getJobDataMap();
+
+        setUrl(map.getString("url"));
+        setMethod(map.getString("method"));
+        setBody(map.getString("body"));
+        setContentType(map.getString("contentType"));
+        setLogin(map.getString("login"));
+        setPwdHash(map.getString("pwd"));
+        setHttpConfiguration((HttpConfiguration) map.get("httpConfiguration"));
+
+        return (T) this;
     }
 
     @Override
