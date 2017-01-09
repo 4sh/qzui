@@ -1,12 +1,16 @@
 package qzui.job;
 
-import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import qzui.domain.JobDescriptor;
+import qzui.domain.LogJobDescriptor;
+import qzui.domain.QuartzJob;
+import restx.factory.Component;
 
-public class LogJob implements Job {
+@Component
+public class LogJob extends QuartzJob {
 
     private static final Logger logger = LoggerFactory.getLogger(LogJob.class);
 
@@ -14,5 +18,10 @@ public class LogJob implements Job {
     public void execute(JobExecutionContext context) throws JobExecutionException {
         logger.info("{} - {}", context.getJobDetail().getKey(),
                 context.getJobDetail().getJobDataMap().getWrappedMap());
+    }
+
+    @Override
+    public <T extends JobDescriptor> T buildDescriptor() {
+        return (T) new LogJobDescriptor();
     }
 }

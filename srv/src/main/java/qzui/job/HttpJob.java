@@ -2,23 +2,26 @@ package qzui.job;
 
 import com.github.kevinsawicki.http.HttpRequest;
 import com.google.common.base.Strings;
-import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import qzui.domain.HttpJobDescriptor;
+import qzui.domain.JobDescriptor;
+import qzui.domain.QuartzJob;
+import restx.factory.Component;
 
 import java.util.Optional;
 
-public class HttpJob implements Job {
+@Component
+public class HttpJob extends QuartzJob {
 
     private static final Logger logger = LoggerFactory.getLogger(HttpJob.class);
 
     @Override
     public void execute(JobExecutionContext context) throws JobExecutionException {
 
-        HttpJobDescriptor descriptor = new HttpJobDescriptor().fillFromJobDetail(context.getJobDetail());
+        HttpJobDescriptor descriptor = buildDescriptor().fillFromJobDetail(context.getJobDetail());
         HttpRequest request = new HttpRequest(descriptor.getUrl(), descriptor.getMethod());
 
         String body = notNullOrEmpty(descriptor.getBody()).orElse("");
@@ -56,5 +59,10 @@ public class HttpJob implements Job {
             return Optional.empty();
         }
         return Optional.of(str);
+    }
+
+    @Override
+    public <T extends JobDescriptor> T buildDescriptor() {
+        return (T) new HttpJobDescriptor();
     }
 }
