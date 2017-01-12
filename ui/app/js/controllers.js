@@ -9,7 +9,7 @@ angular.module('myApp.controllers', []).
         $scope.groups = {};
 
         function loadJobs() {
-            $http.get('/api/jobs').success(function(jobs) {
+            $http.get('api/jobs').success(function(jobs) {
 
                 $scope.jobs = jobs;
 
@@ -18,7 +18,7 @@ angular.module('myApp.controllers', []).
                 });
 
                 _.each($scope.jobs, function(job) {
-                    $http.get('/api/groups/' + job.group + '/jobs/' + job.name).success(function(j) {
+                    $http.get('api/groups/' + job.group + '/jobs/' + job.name).success(function(j) {
                         job.triggers = j.triggers;
                     });
                 });
@@ -28,7 +28,7 @@ angular.module('myApp.controllers', []).
 
         $scope.delete = function(job) {
             if (confirm('Are you sure you want to delete this job?')) {
-                $http.delete('/api/groups/' + job.group + '/jobs/' + job.name).success(function() {
+                $http.delete('api/groups/' + job.group + '/jobs/' + job.name).success(function() {
                     alert('job deleted');
                 });
             }
