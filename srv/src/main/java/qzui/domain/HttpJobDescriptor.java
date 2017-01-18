@@ -1,11 +1,23 @@
 package qzui.domain;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.base.Strings;
 import org.quartz.JobBuilder;
 import org.quartz.JobDataMap;
 import org.quartz.JobDetail;
+import org.slf4j.Logger;
 import qzui.job.HttpJob;
 
+import java.io.IOException;
+import java.util.Optional;
+
+import static org.slf4j.LoggerFactory.getLogger;
+
 public class HttpJobDescriptor extends JobDescriptor {
+
+    private static final Logger logger = getLogger(HttpJobDescriptor.class);
+    private static final ObjectMapper mapper = new ObjectMapper();
 
     private String url;
     private String method = "POST";
@@ -89,7 +101,12 @@ public class HttpJobDescriptor extends JobDescriptor {
         dataMap.put("contentType", contentType);
         dataMap.put("login", login);
         dataMap.put("pwd", pwdHash);
-        dataMap.put("httpConfiguration", httpConfiguration);
+
+        if (httpConfiguration != null) {
+            dataMap.put("httpConfiguration_trustAllCerts", httpConfiguration.isTrustAllCerts());
+            dataMap.put("httpConfiguration_trustAllHosts", httpConfiguration.isTrustAllHosts());
+            dataMap.put("httpConfiguration_followRedirect", httpConfiguration.isFollowRedirect());
+        }
 
         return JobBuilder.newJob(HttpJob.class)
                 .withIdentity(getName(), getGroup())
@@ -108,9 +125,21 @@ public class HttpJobDescriptor extends JobDescriptor {
         setContentType(map.getString("contentType"));
         setLogin(map.getString("login"));
         setPwdHash(map.getString("pwd"));
-        setHttpConfiguration((HttpConfiguration) map.get("httpConfiguration"));
+
+        HttpConfiguration httpConfiguration = new HttpConfiguration();
+        httpConfiguration.setTrustAllCerts(extractBoolean(map, "httpConfiguration_trustAllCerts"));
+        httpConfiguration.setTrustAllHosts(extractBoolean(map, "httpConfiguration_trustAllHosts"));
+        httpConfiguration.setFollowRedirect(extractBoolean(map, "httpConfiguration_followRedirect"));
+        setHttpConfiguration(httpConfiguration);
 
         return (T) this;
+    }
+
+    private Boolean extractBoolean(JobDataMap map, String key) {
+        return Optional.ofNullable(map.get(key))
+                .filter(str -> str instanceof String)
+                .map(str -> Boolean.parseBoolean((String) str))
+                .orElse(false);
     }
 
     @Override
