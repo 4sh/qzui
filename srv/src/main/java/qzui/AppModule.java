@@ -2,6 +2,9 @@ package qzui;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Charsets;
+import com.google.common.base.Optional;
+import com.google.common.base.Predicates;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import restx.security.*;
 import restx.factory.Module;
@@ -32,6 +35,13 @@ public class AppModule {
     @Provides
     public CredentialsStrategy credentialsStrategy() {
         return new BCryptCredentialsStrategy();
+    }
+
+    @Provides
+    public CORSAuthorizer authorizeCORS() {
+        return new StdCORSAuthorizer(
+                Predicates.alwaysTrue(), Predicates.alwaysTrue(),
+                ImmutableList.of("POST"), ImmutableList.of("accept", "content-type", "authorization"), Optional.of(true), 0);
     }
 
     @Provides
