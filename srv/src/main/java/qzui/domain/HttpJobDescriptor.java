@@ -1,23 +1,13 @@
 package qzui.domain;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.base.Strings;
 import org.quartz.JobBuilder;
 import org.quartz.JobDataMap;
 import org.quartz.JobDetail;
-import org.slf4j.Logger;
 import qzui.job.HttpJob;
 
-import java.io.IOException;
 import java.util.Optional;
 
-import static org.slf4j.LoggerFactory.getLogger;
-
 public class HttpJobDescriptor extends JobDescriptor {
-
-    private static final Logger logger = getLogger(HttpJobDescriptor.class);
-    private static final ObjectMapper mapper = new ObjectMapper();
 
     private String url;
     private String method = "POST";
