@@ -37,10 +37,14 @@ public class HttpJob extends QuartzJob {
 
     private void applyHttpConfiguration(HttpJobDescriptor descriptor, HttpRequest request) {
         Optional.ofNullable(descriptor.getHttpConfiguration()).ifPresent((httpConfiguration) -> {
-            if (httpConfiguration.isTrustAllHosts()) {
+            String trustAllHosts = System.getProperty("http.ssl.trustAllHosts");
+            if (httpConfiguration.isTrustAllHosts()
+                    || (!Strings.isNullOrEmpty(trustAllHosts) && Boolean.parseBoolean(trustAllHosts))) {
                 request.trustAllHosts();
             }
-            if (httpConfiguration.isTrustAllCerts()) {
+            String trustAllCerts = System.getProperty("http.ssl.trustAllCerts");
+            if (httpConfiguration.isTrustAllCerts()
+                    || (!Strings.isNullOrEmpty(trustAllCerts) && Boolean.parseBoolean(trustAllCerts))) {
                 request.trustAllCerts();
             }
             request.followRedirects(httpConfiguration.isFollowRedirect());
